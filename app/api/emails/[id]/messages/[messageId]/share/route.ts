@@ -91,6 +91,14 @@ export async function POST(
     const body = await request.json() as { expiresIn: number }
     const { expiresIn } = body // expiresIn 单位为毫秒，0表示永久
 
+    const MAX_EXPIRY_MS = 365 * 24 * 60 * 60 * 1000
+    if (typeof expiresIn !== 'number' || expiresIn < 0 || expiresIn > MAX_EXPIRY_MS) {
+      return NextResponse.json(
+        { error: "Invalid expiry duration" },
+        { status: 400 }
+      )
+    }
+
     // 生成简短的分享token (16个字符)
     const token = nanoid(16)
 
