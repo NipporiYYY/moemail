@@ -473,6 +473,8 @@ const updateEnvVar = (name: string, value: string) => {
  * 主函数
  */
 const main = async () => {
+  const setupOnly = process.argv.includes("--setup-only");
+
   try {
     console.log("🚀 Starting deployment process...");
 
@@ -484,6 +486,12 @@ const main = async () => {
     await checkAndCreateKVNamespace();
     await checkAndCreatePages();
     pushPagesSecret();
+
+    if (setupOnly) {
+      console.log("✅ Setup phase completed (--setup-only). Skipping deployments.");
+      return;
+    }
+
     deployPages();
     deployEmailWorker();
     deployCleanupWorker();
