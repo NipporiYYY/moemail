@@ -46,6 +46,16 @@ export async function POST(request: Request) {
       domain: string
     }>()
 
+    if (name) {
+      const EMAIL_NAME_REGEX = /^[a-zA-Z0-9._-]+$/
+      if (name.length > 64 || !EMAIL_NAME_REGEX.test(name)) {
+        return NextResponse.json(
+          { error: "邮箱名称只能包含字母、数字、点号、下划线和横杠，最长64个字符" },
+          { status: 400 }
+        )
+      }
+    }
+
     if (!EXPIRY_OPTIONS.some(option => option.value === expiryTime)) {
       return NextResponse.json(
         { error: "无效的过期时间" },

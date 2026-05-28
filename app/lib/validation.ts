@@ -12,3 +12,16 @@ export const authSchema = z.object({
 })
 
 export type AuthSchema = z.infer<typeof authSchema>
+
+const BLOCKED_HOSTS = /^(localhost|127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|192\.168\.\d+\.\d+|169\.254\.\d+\.\d+|0\.0\.0\.0|\[::1?\])$/i
+
+export function isPublicUrl(urlString: string): boolean {
+  try {
+    const url = new URL(urlString)
+    if (url.protocol !== "https:" && url.protocol !== "http:") return false
+    if (BLOCKED_HOSTS.test(url.hostname)) return false
+    return true
+  } catch {
+    return false
+  }
+}

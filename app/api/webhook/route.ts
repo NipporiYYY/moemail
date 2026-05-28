@@ -3,6 +3,7 @@ import { createDb } from "@/lib/db"
 import { webhooks } from "@/lib/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { isPublicUrl } from "@/lib/validation"
 
 export const runtime = "edge"
 
@@ -31,6 +32,13 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { url, enabled } = webhookSchema.parse(body)
+
+    if (!isPublicUrl(url)) {
+      return Response.json(
+        { error: "Webhook URL 不允许指向内部网络地址" },
+        { status: 400 }
+      )
+    }
     
     const db = createDb()
     const now = new Date()

@@ -2,6 +2,7 @@ import { callWebhook } from "@/lib/webhook"
 import { WEBHOOK_CONFIG } from "@/config"
 import { z } from "zod"
 import { EmailMessage } from "@/lib/webhook"
+import { isPublicUrl } from "@/lib/validation"
 
 export const runtime = "edge"
 
@@ -13,6 +14,13 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { url } = testSchema.parse(body)
+
+    if (!isPublicUrl(url)) {
+      return Response.json(
+        { error: "Webhook URL 不允许指向内部网络地址" },
+        { status: 400 }
+      )
+    }
 
     await callWebhook(url, {
       event: WEBHOOK_CONFIG.EVENTS.NEW_MESSAGE,
